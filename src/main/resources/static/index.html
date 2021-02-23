@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="application/javascript">
+
+
+        function registrer() {
+
+            const bil = {
+                personNr: $('#input-personnummer').val(),
+                navn: $('#input-navn').val(),
+                adresse: $('#input-adresse').val(),
+                kjennetegn: $('#input-kjennetegn').val(),
+                bilmerke: $('#input-bilmerke').val(),
+                biltype: $('#input-biltype').val()
+            };
+
+            let error = 0;
+            if(bil.personNr ===""){error++}
+            if(bil.navn === ""){error++}
+            if(bil.adresse === ""){error++}
+            if(bil.kjennetegn === ""){error++}
+            if(bil.bilmerke === ""){error++}
+            if(bil.biltype === ""){error++}
+
+            if(error>0){
+                alert("Vennligst fyll ut alle felt")
+            } else {
+                $.post("/lagre", bil, function () {
+                    hentAlle();
+                });
+
+                $('#input-personnummer').val("");
+                $('#input-navn').val("");
+                $('#input-adresse').val("");
+                $('#input-kjennetegn').val("");
+                $('#input-bilmerke').val("");
+                $('#input-biltype').val("");
+            }
+
+        }
+
+        function hentAlle(){
+            $.get("/hentAlle", function(data){
+                formaterData(data);
+            });
+        }
+
+        function formaterData(biler){
+
+            let ut = "<table><tr><th>Personnr</th><th>Navn</th><th>Adresse</th><th>Kjennetegn</th>" +
+                "<th>Bilmerke</th><th>Biltype</th></tr>";
+
+            for(const bil of biler){
+                ut += "<tr><td>"+bil.personNr+"</td><td>"+bil.navn+"</td><td>"+bil.adresse+"</td><td>" +
+                    bil.kjennetegn+"</td><td>"+bil.bilmerke+"</td><td>"+bil.biltype+"</td></tr>"
+            }
+            ut += "</table>";
+            $('#utboks').html(ut);
+
+        }
+
+        function slettAlle(){
+
+            $.post("/slett");
+
+            let ut = "<table><tr><th>Personnr</th><th>Navn</th><th>Adresse</th><th>Kjennetegn</th>" +
+                "<th>Bilmerke</th><th>Biltype</th></tr>";
+
+            $('#utboks').html(ut);
+        }
+
+    </script>
+</head>
+<body>
+
+<h2>Motorvognregister</h2>
+
+<table class="input-table">
+    <tr><th>Eiers personnummer</th><th>Eiers navn</th><th>Eiers adresse</th></tr>
+    <tr>
+        <td><input type="text" id="input-personnummer"></td>
+        <td><input type="text" id="input-navn"></td>
+        <td><input type="text" id="input-adresse"></td>
+    </tr>
+    <tr><th>Kjennetegn</th><th>Bilmerke</th><th>Biltype</th></tr>
+    <tr>
+        <td><input type="text" id="input-kjennetegn"></td>
+        <td><input type="text" id="input-bilmerke"></td>
+        <td><input type="text" id="input-biltype"></td>
+    </tr>
+</table>
+
+<button onclick="registrer()">Registrer / Vis register</button>
+
+
+<div id="utboks"></div>
+<br>
+<button onclick="slettAlle()">Slett alle</button>
+
+<style>
+
+    .input-table td, .input-table th {
+        text-align: center;
+        padding: 2px;
+    }
+
+    #utboks td, #utboks th {
+        text-align: center;
+        padding: 5px;
+    }
+</style>
+
+</body>
+</html>
